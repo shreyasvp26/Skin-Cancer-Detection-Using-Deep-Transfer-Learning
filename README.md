@@ -1,4 +1,4 @@
-# AI-Powered Skin Cancer Detection System
+# Skin-Cancer-Detection-Using-Deep-Transfer-Learning
 
 This project consists of a React frontend and a FastAPI backend for detecting skin cancer from dermoscopic images.
 
@@ -44,4 +44,3 @@ You need to run **two separate terminals** to start the full application.
 - **Backend API Docs**: Visit `http://localhost:8000/docs` to test endpoints manually.
 - **Stress Test**: Run `python3 stress_test_api.py` in the `backend/` directory to verify stability.
 
-# Skin-Cancer-Detection-Using-Deep-Transfer-Learning
