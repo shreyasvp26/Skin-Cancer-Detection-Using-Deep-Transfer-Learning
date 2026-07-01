@@ -55,7 +55,7 @@ const HeroSection = () => {
 
                         <motion.p variants={itemVariants} className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                             Upload dermoscopic images for AI-assisted screening of skin lesions.
-                            Our deep learning model provides a preliminary analysis to support — not replace — professional dermatological evaluation.
+                            Our deep learning model provides a preliminary analysis to support professional dermatological evaluation.
                         </motion.p>
 
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
