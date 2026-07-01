@@ -36,7 +36,7 @@ const Footer = () => {
 
                     {/* Team */}
                     <div>
-                        <h4 className="text-lg font-semibold mb-4 text-slate-200">Our Team</h4>
+                        <h4 className="text-lg font-semibold mb-4 text-slate-200">Founder</h4>
                         <ul className="space-y-2">
                             {teamMembers.map((member, index) => (
                                 <li key={index} className="text-slate-400 text-sm hover:text-primary transition-colors">
