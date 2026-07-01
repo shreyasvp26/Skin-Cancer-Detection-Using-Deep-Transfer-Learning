@@ -1,15 +1,25 @@
 # macOS
 .DS_Store
+**/.DS_Store
 
 # Python
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
 
 # Node
 node_modules/
 
-# Backup / environment
+# Environment
 .env
 
-# Cached images
+# Cached images / uploads
 backend/uploads/
+
+# Model weights (use Git LFS or download separately)
+*.pth
+!backend/model/best_merged_model.pth
+
+# Build output
+frontend/dist/

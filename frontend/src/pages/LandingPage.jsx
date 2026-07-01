@@ -3,24 +3,24 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import HeroSection from '../components/HeroSection';
 import { motion } from 'framer-motion';
-import { FaCheckCircle, FaUserMd, FaLaptopMedical } from 'react-icons/fa';
+import { FaUserMd, FaLaptopMedical, FaCheckCircle } from 'react-icons/fa';
 
 const LandingPage = () => {
     const features = [
         {
             icon: <FaUserMd className="text-4xl text-primary" />,
-            title: "Clinical Decision Support",
-            description: "Assists dermatologists by providing a second opinion based on deep learning analysis of dermoscopic images."
+            title: "Screening Support",
+            description: "Provides an AI-assisted preliminary screening of dermoscopic images to support — not replace — professional dermatological evaluation."
         },
         {
             icon: <FaLaptopMedical className="text-4xl text-accent" />,
-            title: "Tele-dermatology Ready",
-            description: "Designed to be integrated into tele-health workflows, enabling remote screening and triage."
+            title: "Research Tool",
+            description: "Designed as a research and educational project demonstrating how deep learning can be applied to dermoscopic image analysis."
         },
         {
             icon: <FaCheckCircle className="text-4xl text-green-500" />,
-            title: "High Accuracy",
-            description: "Utilizes state-of-the-art CNN architectures like EfficientNet and ResNet for reliable predictions."
+            title: "Deep Learning + Metadata",
+            description: "Combines an EfficientNet-B0 image backbone with patient metadata (age, sex) via a fusion MLP for context-aware screening."
         }
     ];
 
@@ -35,9 +35,9 @@ const LandingPage = () => {
                 <section className="py-20 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Why Choose Our System?</h2>
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4">How It Works</h2>
                             <p className="text-slate-600 max-w-2xl mx-auto">
-                                Our AI model combines image analysis with patient metadata to deliver comprehensive diagnostic insights.
+                                Our AI model analyzes dermoscopic images combined with patient metadata to provide preliminary screening results.
                             </p>
                         </div>
 
@@ -64,8 +64,8 @@ const LandingPage = () => {
                 <section className="py-20 bg-slate-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold text-slate-900 mb-4">How It Works</h2>
-                            <p className="text-slate-600">Simple 3-step process to get your results.</p>
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Simple 3-Step Process</h2>
+                            <p className="text-slate-600">Upload, provide optional context, and get your screening result.</p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
@@ -74,8 +74,8 @@ const LandingPage = () => {
 
                             {[
                                 { step: 1, title: "Upload Image", desc: "Upload a clear dermoscopic image of the skin lesion." },
-                                { step: 2, title: "Add Details", desc: "Provide patient metadata like age, sex, and location." },
-                                { step: 3, title: "Get Results", desc: "Receive instant prediction with confidence score & heatmap." }
+                                { step: 2, title: "Optional Context", desc: "Provide optional patient details for reference." },
+                                { step: 3, title: "Get Results", desc: "Receive an AI screening result with confidence score." }
                             ].map((item, index) => (
                                 <div key={index} className="relative bg-slate-50">
                                     <div className="w-24 h-24 mx-auto bg-white rounded-full border-4 border-primary/20 flex items-center justify-center text-2xl font-bold text-primary mb-6 shadow-sm">

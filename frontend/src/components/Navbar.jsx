@@ -46,6 +46,8 @@ const Navbar = () => {
                         <button
                             onClick={toggleMenu}
                             className="text-slate-600 hover:text-primary focus:outline-none"
+                            aria-expanded={isOpen}
+                            aria-label="Navigation menu"
                         >
                             {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                         </button>

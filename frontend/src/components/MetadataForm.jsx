@@ -17,13 +17,17 @@ const MetadataForm = ({ formData, setFormData }) => {
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-100"
         >
-            <h3 className="text-xl font-semibold text-slate-900 mb-6">Patient Metadata</h3>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Patient Context</h3>
+            <p className="text-xs text-slate-400 mb-6">
+                Age and sex are used by the AI model to inform its prediction.
+                Anatomical site and skin tone are collected for reference only.
+            </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Age */}
                 <div>
                     <label htmlFor="age" className="block text-sm font-medium text-slate-700 mb-2">
-                        Age
+                        Age <span className="text-slate-400 text-xs">(optional)</span>
                     </label>
                     <input
                         type="number"
@@ -41,7 +45,7 @@ const MetadataForm = ({ formData, setFormData }) => {
                 {/* Sex */}
                 <div>
                     <label htmlFor="sex" className="block text-sm font-medium text-slate-700 mb-2">
-                        Sex
+                        Sex <span className="text-slate-400 text-xs">(optional)</span>
                     </label>
                     <select
                         id="sex"
@@ -60,7 +64,7 @@ const MetadataForm = ({ formData, setFormData }) => {
                 {/* Lesion Location */}
                 <div className="sm:col-span-2">
                     <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-2">
-                        Anatomical Site (Location)
+                        Anatomical Site <span className="text-slate-400 text-xs">(optional)</span>
                     </label>
                     <select
                         id="location"
@@ -80,10 +84,10 @@ const MetadataForm = ({ formData, setFormData }) => {
                     </select>
                 </div>
 
-                {/* Skin Tone (Optional but good for model context if needed) */}
+                {/* Skin Tone */}
                 <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Skin Tone (Fitzpatrick Scale)
+                        Skin Tone (Fitzpatrick Scale) <span className="text-slate-400 text-xs">(optional)</span>
                     </label>
                     <div className="grid grid-cols-6 gap-2">
                         {[1, 2, 3, 4, 5, 6].map((type) => (
@@ -91,23 +95,26 @@ const MetadataForm = ({ formData, setFormData }) => {
                                 key={type}
                                 type="button"
                                 onClick={() => setFormData(prev => ({ ...prev, skinTone: type }))}
+                                aria-label={`Fitzpatrick skin type ${type}`}
+                                aria-pressed={formData.skinTone === type}
                                 className={`
-                  h-10 rounded-lg border-2 transition-all duration-200
-                  ${formData.skinTone === type ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:scale-105'}
-                `}
+                                    h-10 rounded-lg border-2 transition-all duration-200
+                                    ${formData.skinTone === type ? 'border-primary ring-2 ring-primary/30 scale-105' : 'border-transparent hover:scale-105'}
+                                `}
                                 style={{ backgroundColor: getSkinToneColor(type) }}
-                                title={`Type ${type}`}
                             />
                         ))}
                     </div>
-                    <p className="text-xs text-slate-500 mt-2 text-right">Selected: {formData.skinTone ? `Type ${formData.skinTone}` : 'None'}</p>
+                    <p className="text-xs text-slate-500 mt-2 text-right">
+                        Selected: {formData.skinTone ? `Type ${formData.skinTone}` : 'None'}
+                    </p>
                 </div>
             </div>
         </motion.div>
     );
 };
 
-// Helper for skin tone colors
+// Helper for Fitzpatrick skin tone colors
 const getSkinToneColor = (type) => {
     const colors = {
         1: '#F3E5D8', // Type I

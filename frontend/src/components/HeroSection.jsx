@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowRight, FaMicroscope, FaBrain, FaShieldAlt } from 'react-icons/fa';
+import { FaArrowRight } from 'react-icons/fa';
 import heroImage from '../assets/hero_illustration.png';
+import DisclaimerBanner from './DisclaimerBanner';
 
 const HeroSection = () => {
     const containerVariants = {
@@ -44,7 +45,7 @@ const HeroSection = () => {
                     >
                         <motion.div variants={itemVariants} className="inline-block mb-4 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100">
                             <span className="text-primary font-semibold text-sm tracking-wide uppercase">
-                                AI-Powered Dermatology
+                                AI-Powered Screening Tool
                             </span>
                         </motion.div>
 
@@ -53,19 +54,22 @@ const HeroSection = () => {
                         </motion.h1>
 
                         <motion.p variants={itemVariants} className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                            Upload dermoscopic images and metadata to get instant, accurate predictions for benign or malignant skin lesions using our advanced Deep Learning model.
+                            Upload dermoscopic images for AI-assisted screening of skin lesions.
+                            Our deep learning model provides a preliminary analysis to support — not replace — professional dermatological evaluation.
                         </motion.p>
 
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                             <Link
                                 to="/upload"
+                                id="cta-start-analysis"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-white bg-primary hover:bg-primary/90 rounded-xl shadow-lg shadow-primary/25 transition-all duration-200 hover:-translate-y-1"
                             >
-                                Start Analysis
+                                Start Screening
                                 <FaArrowRight className="ml-2" />
                             </Link>
                             <Link
                                 to="/about"
+                                id="cta-learn-more"
                                 className="inline-flex items-center justify-center px-8 py-4 text-base font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl transition-all duration-200"
                             >
                                 Learn More
@@ -74,17 +78,21 @@ const HeroSection = () => {
 
                         <motion.div variants={itemVariants} className="mt-12 grid grid-cols-3 gap-6 text-center lg:text-left border-t border-slate-200 pt-8">
                             <div>
-                                <div className="text-2xl font-bold text-slate-900">95%+</div>
-                                <div className="text-sm text-slate-500">Accuracy</div>
+                                <div className="text-2xl font-bold text-slate-900">AI + Meta</div>
+                                <div className="text-sm text-slate-500">Image &amp; Metadata</div>
                             </div>
                             <div>
                                 <div className="text-2xl font-bold text-slate-900">24/7</div>
                                 <div className="text-sm text-slate-500">Availability</div>
                             </div>
                             <div>
-                                <div className="text-2xl font-bold text-slate-900">Secure</div>
-                                <div className="text-sm text-slate-500">Processing</div>
+                                <div className="text-2xl font-bold text-slate-900">Research</div>
+                                <div className="text-sm text-slate-500">Use Only</div>
                             </div>
+                        </motion.div>
+
+                        <motion.div variants={itemVariants} className="mt-6">
+                            <DisclaimerBanner compact />
                         </motion.div>
                     </motion.div>
 
@@ -98,7 +106,7 @@ const HeroSection = () => {
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-100 bg-white p-2">
                             <img
                                 src={heroImage}
-                                alt="AI Skin Cancer Detection"
+                                alt="AI Skin Lesion Screening Illustration"
                                 className="w-full h-full object-cover rounded-xl"
                             />
                         </div>

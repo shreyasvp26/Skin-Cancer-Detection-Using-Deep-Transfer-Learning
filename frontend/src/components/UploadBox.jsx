@@ -3,6 +3,8 @@ import { useDropzone } from 'react-dropzone';
 import { FaCloudUploadAlt, FaImage, FaTimes } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB — matches backend limit
+
 const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles && acceptedFiles.length > 0) {
@@ -12,14 +14,30 @@ const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
         }
     }, [onImageSelect]);
 
+    const onDropRejected = useCallback((fileRejections) => {
+        const rejection = fileRejections[0];
+        if (rejection) {
+            const error = rejection.errors[0];
+            if (error?.code === 'file-too-large') {
+                alert(`File is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`);
+            } else if (error?.code === 'file-invalid-type') {
+                alert('Invalid file type. Please upload a JPG, JPEG, or PNG image.');
+            } else {
+                alert('File rejected. Please try a different image.');
+            }
+        }
+    }, []);
+
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
+        onDropRejected,
         accept: {
             'image/jpeg': [],
             'image/png': [],
             'image/jpg': []
         },
         maxFiles: 1,
+        maxSize: MAX_FILE_SIZE,
         multiple: false
     });
 
@@ -34,19 +52,19 @@ const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
                         exit={{ opacity: 0, y: -10 }}
                         {...getRootProps()}
                         className={`
-              relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300
-              ${isDragActive
+                            relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300
+                            ${isDragActive
                                 ? 'border-primary bg-primary/5 scale-[1.02]'
                                 : 'border-slate-300 hover:border-primary hover:bg-slate-50'
                             }
-            `}
+                        `}
                     >
                         <input {...getInputProps()} />
                         <div className="flex flex-col items-center justify-center space-y-4">
                             <div className={`
-                p-4 rounded-full transition-colors duration-300
-                ${isDragActive ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-400'}
-              `}>
+                                p-4 rounded-full transition-colors duration-300
+                                ${isDragActive ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-400'}
+                            `}>
                                 <FaCloudUploadAlt size={40} />
                             </div>
                             <div>
@@ -58,7 +76,7 @@ const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
                                 </p>
                             </div>
                             <p className="text-xs text-slate-400">
-                                Supports: JPG, JPEG, PNG
+                                Supports: JPG, JPEG, PNG (max 10MB)
                             </p>
                         </div>
                     </motion.div>
@@ -72,7 +90,7 @@ const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
                     >
                         <img
                             src={selectedImage}
-                            alt="Preview"
+                            alt="Selected dermoscopic image preview"
                             className="w-full h-64 sm:h-80 object-contain bg-black/5"
                         />
 
@@ -84,6 +102,7 @@ const UploadBox = ({ onImageSelect, selectedImage, onClear }) => {
                                 }}
                                 className="bg-white/90 hover:bg-white text-slate-700 hover:text-red-500 p-2 rounded-full shadow-md backdrop-blur-sm transition-all duration-200 transform hover:scale-110"
                                 title="Remove image"
+                                aria-label="Remove selected image"
                             >
                                 <FaTimes size={16} />
                             </button>

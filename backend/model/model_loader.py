@@ -1,106 +1,114 @@
 import torch
 import torch.nn as nn
 import timm
-import ssl
-from efficientnet_pytorch import EfficientNet
+import logging
 
-# Fix for SSL certificate verify failed on Mac
-try:
-    _create_unverified_https_context = ssl._create_unverified_context
-except AttributeError:
-    pass
-else:
-    ssl._create_default_https_context = _create_unverified_https_context
+logger = logging.getLogger(__name__)
 
-class EnsembleSkinCancerModel(nn.Module):
+
+class SkinCancerModel(nn.Module):
     """
-    Ensemble of 4 CNN backbones (NO metadata).
+    Single-backbone skin-lesion classifier with metadata fusion.
+
+    Architecture:
+        enet  = EfficientNet-B0  (1280-d image features)
+        meta  = MLP              (3 → 512 → 128-d metadata features)
+        myfc  = Linear           (1280 + 128 = 1408 → 1 logit)
+
+    Metadata input: [age_norm, sex_male, sex_female]  (3 features).
+    Output: single logit (pass through sigmoid for probability).
     """
 
-    def __init__(self, num_classes=1):
-        super(EnsembleSkinCancerModel, self).__init__()
+    def __init__(self, num_classes=1, meta_features=3):
+        super(SkinCancerModel, self).__init__()
 
-        # EfficientNet-B1
-        self.m1 = timm.create_model("efficientnet_b1", pretrained=False, num_classes=0)
-        self.m1_dim = self.m1.num_features
+        # Image backbone — EfficientNet-B0
+        self.enet = timm.create_model("efficientnet_b0", pretrained=False, num_classes=0)
+        self.enet_dim = self.enet.num_features  # 1280
 
-        # EfficientNet-B4
-        self.m2 = timm.create_model("efficientnet_b4", pretrained=False, num_classes=0)
-        self.m2_dim = self.m2.num_features
+        # Metadata MLP
+        self.meta = nn.Sequential(
+            nn.Linear(meta_features, 512),       # meta.0
+            nn.BatchNorm1d(512),                  # meta.1
+            nn.ReLU(),                            # meta.2
+            nn.Dropout(p=0.3),                    # meta.3
+            nn.Linear(512, 128),                  # meta.4
+            nn.BatchNorm1d(128),                  # meta.5
+            nn.ReLU(),                            # meta.6
+            nn.Dropout(p=0.3),                    # meta.7
+        )
+        self.meta_dim = 128
 
-        # DenseNet121
-        self.m3 = timm.create_model("densenet121", pretrained=False, num_classes=0)
-        self.m3_dim = self.m3.num_features
-
-        # ResNet50
-        self.m4 = timm.create_model("resnet50", pretrained=False, num_classes=0)
-        self.m4_dim = self.m4.num_features
-
-        # total image features
-        self.image_dim = self.m1_dim + self.m2_dim + self.m3_dim + self.m4_dim
-
-        # Normalization layer to handle large feature magnitudes
-        self.norm = nn.LayerNorm(self.image_dim)
-
-        # final classifier (NO metadata)
-        self.fc = nn.Linear(self.image_dim, num_classes)
+        # Final classifier (image + metadata)
+        self.myfc = nn.Linear(self.enet_dim + self.meta_dim, num_classes)
 
     def forward(self, x, metadata=None):
-        # helper for feature extraction
-        def feat(m, inp):
-            if hasattr(m, "forward_features"):
-                f = m.forward_features(inp)
-            else:
-                f = m(inp)
-            if f.dim() == 4:
-                f = nn.functional.adaptive_avg_pool2d(f, 1).reshape(f.size(0), -1)
-            return f
+        """
+        Forward pass.
 
-        f1 = feat(self.m1, x)
-        f2 = feat(self.m2, x)
-        f3 = feat(self.m3, x)
-        f4 = feat(self.m4, x)
+        Args:
+            x:        Image tensor  (B, 3, 224, 224).
+            metadata: Metadata tensor (B, 3) — [age_norm, sex_male, sex_female].
+                      If None, zeros are used as a fallback.
+        """
+        # Image features
+        img_feats = self.enet(x)  # (B, 1280)
 
-        feats = torch.cat([f1, f2, f3, f4], dim=1)
-        
-        # Normalize features
-        feats = self.norm(feats)
-        
-        return self.fc(feats)
+        # Metadata features
+        if metadata is None:
+            metadata = torch.zeros(x.size(0), 3, device=x.device)
+        meta_feats = self.meta(metadata)  # (B, 128)
 
-def load_model(weights_path, device):
-    model = EnsembleSkinCancerModel(num_classes=1)
+        # Concatenate and classify
+        combined = torch.cat([img_feats, meta_feats], dim=1)  # (B, 1408)
+        return self.myfc(combined)
 
-    if weights_path and torch.cuda.is_available() and device.type == 'cuda':
-        map_location = None
-    else:
-        map_location = torch.device('cpu')
 
-    try:
-        if weights_path:
-            print(f"Loading weights from {weights_path}")
+def load_model(weights_path: str, device: torch.device) -> SkinCancerModel:
+    """
+    Load the skin cancer model with trained weights.
 
-            # Load the state_dict EXACTLY as saved
-            state_dict = torch.load(weights_path, map_location=map_location)
+    Raises ``RuntimeError`` if weights cannot be loaded — the application
+    must NOT silently fall back to random weights.
+    """
+    model = SkinCancerModel(num_classes=1)
 
-            # Load weights (no renaming!)
-            missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
+    if not weights_path:
+        raise RuntimeError(
+            "No model weights path configured. "
+            "Set MODEL_PATH in common.py or the MODEL_PATH environment variable."
+        )
 
-            print("Weights loaded successfully.")
-            if missing_keys:
-                print(f"Missing keys: {missing_keys}")
-            if unexpected_keys:
-                print(f"Unexpected keys: {unexpected_keys}")
+    map_location = None if (torch.cuda.is_available() and device.type == "cuda") else torch.device("cpu")
 
-        else:
-            print("No weights provided. Using random weights.")
+    logger.info("Loading weights from %s", weights_path)
 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        print(f"Error loading weights: {e}")
-        print("Using initialized model without custom weights.")
+    # weights_only=True prevents arbitrary code execution via malicious .pth files.
+    state_dict = torch.load(weights_path, map_location=map_location, weights_only=True)
+
+    # strict=True so any shape mismatch or missing key is a hard failure.
+    missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=True)
+
+    if unexpected_keys:
+        raise RuntimeError(
+            f"Unexpected keys in weight file (architecture mismatch): {unexpected_keys}"
+        )
+
+    if missing_keys:
+        raise RuntimeError(
+            f"Missing keys in weight file (architecture mismatch): {missing_keys}"
+        )
 
     model.to(device)
     model.eval()
+    logger.info("Model loaded successfully on device=%s", device)
     return model
+
+
+def verify_model_loaded(model: SkinCancerModel) -> dict:
+    """Return a status dict for health-check endpoints."""
+    return {
+        "status": "ok" if model is not None else "error",
+        "architecture": "SkinCancerModel (EfficientNet-B0 + Metadata MLP)",
+        "num_parameters": sum(p.numel() for p in model.parameters()) if model else 0,
+    }
