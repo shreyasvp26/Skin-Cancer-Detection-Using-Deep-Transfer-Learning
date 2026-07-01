@@ -11,10 +11,6 @@ ENV ENABLE_DOCS=false
 WORKDIR /app
 
 # Install system dependencies if required for OpenCV or ML libraries
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install python dependencies
 COPY requirements.txt .
