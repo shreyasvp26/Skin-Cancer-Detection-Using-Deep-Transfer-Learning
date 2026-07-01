@@ -30,7 +30,7 @@ ALLOWED_ORIGINS = [
     o.strip()
     for o in os.environ.get(
         "ALLOWED_ORIGINS",
-        "http://localhost:5173,http://localhost:3000",
+        "http://localhost:5173,http://localhost:3000,https://YOUR-VERCEL-URL.vercel.app",
     ).split(",")
     if o.strip()
 ]
@@ -94,7 +94,7 @@ async def root():
 async def health():
     """Health-check endpoint for deployment readiness probes."""
     status = verify_model_loaded(model)
-    status["model_path"] = os.path.basename(MODEL_PATH)
+    status["status"] = "healthy"
     return status
 
 
