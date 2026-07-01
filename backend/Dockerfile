@@ -30,4 +30,4 @@ RUN mkdir -p uploads && chmod 777 uploads
 EXPOSE 8000
 
 # Run uvicorn server with multiple workers for concurrency
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT} --workers 2"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
