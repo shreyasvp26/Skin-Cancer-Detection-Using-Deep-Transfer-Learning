@@ -4,10 +4,6 @@ import { FaExclamationTriangle } from 'react-icons/fa';
 const Footer = () => {
     const teamMembers = [
         'Shreyas Patil',
-        'Om Deshmukh',
-        'Ruturaj Challawar',
-        'Vinayak Pandalwad',
-        'Suparna Joshi'
     ];
 
     return (
