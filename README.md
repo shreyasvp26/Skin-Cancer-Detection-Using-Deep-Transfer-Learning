@@ -108,7 +108,3 @@ python -m model.test_model
 ## Team
 
 - Shreyas Patil
-- Om Deshmukh
-- Ruturaj Challawar
-- Vinayak Pandalwad
-- Suparna Joshi (Guide)
