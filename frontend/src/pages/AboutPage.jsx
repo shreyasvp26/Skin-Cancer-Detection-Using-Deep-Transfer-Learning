@@ -24,7 +24,7 @@ const AboutPage = () => {
             role: "Lightweight, highly efficient feature extraction capturing core spatial patterns."
         },
         {
-            name: "EfficientNet-B3",
+            name: "EfficientNet-B4",
             type: "Scaled Depthwise ConvNet",
             role: "Higher-resolution compound scaling for fine-grained lesion surface features."
         },
